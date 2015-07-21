@@ -1,0 +1,1 @@
+[{"username":"ddd","text":"adsdd","roomname":"lobby","objectId":0.9156063944101334,"createdAt":"2015-07-21T19:27:10.837Z"},{"username":"ddd","text":"ddd","roomname":"lobby","objectId":0.40019574319012463,"createdAt":"2015-07-21T19:28:30.067Z"},{"username":"ddd","text":"asdfasdf","roomname":"lobby","objectId":0.7592669378500432,"createdAt":"2015-07-21T19:28:32.727Z"}]

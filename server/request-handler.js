@@ -13,14 +13,15 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 // require fs to read html/css/js files
 var fs = require('fs');
+var express = require('express');
+var expressApp = express();
 
 
-
-
-var results = [{username: "Alpha", text: "And on the first day... there was a message", roomname: "lobby"}];
+// var results = [{username: "Alpha", text: "And on the first day... there was a message", roomname: "lobby"}];
 
 
 var requestHandler = function(request, response) {
+  var results = [];
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -57,18 +58,22 @@ var requestHandler = function(request, response) {
   // filter 'root' to serve files
   if (request.url === '/') {
     console.log('root')
-    var dir = './chatterbox-client/client/index.html';
-    fs.readFile(dir, function (err,data) {
-        if (err) {
-          response.writeHead(404);
-          console.log("--- ERROR SERVING FILES ----")
-          response.end(JSON.stringify(err));
-          return;
-        }
-        response.writeHead(200);
-        console.log("--- SERVING FILES ----")
-        response.end(data);
-      });
+    var dir = './chatterbox-client/';
+    expressApp.use(express.static(dir));
+
+    response.writeHead(200, {'Content-Type' : 'text/html'});
+    response.end(dir + 'client/index.html')
+    // fs.readFile(dir, function (err,data) {
+    //     if (err) {
+    //       response.writeHead(404);
+    //       console.log("--- ERROR SERVING FILES ----")
+    //       response.end(JSON.stringify(err));
+    //       return;
+    //     }
+    //     response.writeHead(200);
+    //     console.log("--- SERVING FILES ----")
+    //     response.end(data);
+    //   });
   } else if (request.url.indexOf("classes") !== -1){
     if(request.method === 'OPTIONS'){
       writeHead(200);
@@ -76,11 +81,16 @@ var requestHandler = function(request, response) {
     }
     if (request.method === 'GET'){
       writeHead(200);
-      var obj = {results: results};
-      var stringified = JSON.stringify(obj);
-      // console.log(stringified);
-      console.log("MESSAGE ARRAY", obj.results)
-      response.end(stringified);
+      fs.readFile('server/results.txt', function(err, data){
+        if (err) throw err;
+        results = JSON.parse(data);
+        // console.log(results);
+        var obj = {results: results};
+        var stringified = JSON.stringify(obj);
+        // console.log(stringified);
+        // console.log("MESSAGE ARRAY", obj.results)
+        response.end(stringified);
+      })
     }
 
     if (request.method === 'POST'){
@@ -100,15 +110,25 @@ var requestHandler = function(request, response) {
         requestBody = JSON.parse(requestBody);
         requestBody.objectId = Math.random();
         requestBody.createdAt = new Date();
-        results.push(requestBody);
-        response.end();
+        fs.readFile('server/results.txt', function(err, data){
+          if (err) throw err;
+          results = JSON.parse(data);
+          console.log(" -- RESULTS ON POST -- ", results);
+          results.push(requestBody);
+          var data = JSON.stringify(results);
+          fs.writeFile('server/results.txt',data,function(err){
+            if (err) return console.log(err);
+            response.end();
+          });
+        });
       })
     }
-  } else {
-    writeHead(404);
-    console.log(" ----   UNKNOWN URL   ---- : ", request.url);
-    response.end();
-  }
+  } 
+  // else {
+  //   writeHead(404);
+  //   console.log(" ----   UNKNOWN URL   ---- : ", request.url);
+  //   response.end();
+  // }
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
   // response.end() will be the body of the response - i.e. what shows
