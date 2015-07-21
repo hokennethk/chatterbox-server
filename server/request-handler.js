@@ -11,6 +11,14 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+// require fs to read html/css/js files
+var fs = require('fs');
+
+
+
+
+var results = [{username: "Alpha", text: "And on the first day... there was a message", roomname: "lobby"}];
+
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -28,9 +36,9 @@ var requestHandler = function(request, response) {
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
   console.log("Serving request type " + request.method + " for url " + request.url);
-
   // The outgoing status.
-  var statusCode = 200;
+
+  var statusCode;
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
@@ -40,11 +48,67 @@ var requestHandler = function(request, response) {
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = "text/plain";
-
   // .writeHead() writes to the request line and headers of the response,
-  // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+  // which includes the status and all headers.\
+  var writeHead = function(statusCode){
+    response.writeHead(statusCode, headers);
+  }
 
+  // filter 'root' to serve files
+  if (request.url === '/') {
+    console.log('root')
+    var dir = './chatterbox-client/client/index.html';
+    fs.readFile(dir, function (err,data) {
+        if (err) {
+          response.writeHead(404);
+          console.log("--- ERROR SERVING FILES ----")
+          response.end(JSON.stringify(err));
+          return;
+        }
+        response.writeHead(200);
+        console.log("--- SERVING FILES ----")
+        response.end(data);
+      });
+  } else if (request.url.indexOf("classes") !== -1){
+    if(request.method === 'OPTIONS'){
+      writeHead(200);
+      response.end();
+    }
+    if (request.method === 'GET'){
+      writeHead(200);
+      var obj = {results: results};
+      var stringified = JSON.stringify(obj);
+      // console.log(stringified);
+      console.log("MESSAGE ARRAY", obj.results)
+      response.end(stringified);
+    }
+
+    if (request.method === 'POST'){
+      writeHead(201);
+      var requestBody = '';
+      // results.push(request.json);
+      //console.log("request: ", Object.keys(request));
+      // console.log("client: ", request.client);
+      request.on('data', function(chunk) {
+        console.log(chunk);
+        requestBody += chunk;
+      });
+
+      request.on('end', function() {
+        console.log('request ended');
+        // console.log(requestBody);
+        requestBody = JSON.parse(requestBody);
+        requestBody.objectId = Math.random();
+        requestBody.createdAt = new Date();
+        results.push(requestBody);
+        response.end();
+      })
+    }
+  } else {
+    writeHead(404);
+    console.log(" ----   UNKNOWN URL   ---- : ", request.url);
+    response.end();
+  }
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
   // response.end() will be the body of the response - i.e. what shows
@@ -52,7 +116,6 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end("Hello, World!");
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -67,7 +130,10 @@ var requestHandler = function(request, response) {
 var defaultCorsHeaders = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "access-control-allow-headers": "content-type, accept",
+  "access-control-allow-headers": "content-type, accept, X-Parse-Application-Id, X-Parse-REST-API-Key",
   "access-control-max-age": 10 // Seconds.
 };
+
+exports.requestHandler = requestHandler;
+exports.defaultCorsHeaders = defaultCorsHeaders;
 
