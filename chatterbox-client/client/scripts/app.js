@@ -6,15 +6,15 @@ $(function() {
 //TODO: The current 'addFriend' function just adds the class 'friend'
 //to all messages sent by the user
     // server: 'https://api.parse.com/1/classes/chatterbox/',
-    server: 'http://127.0.0.1:3000/classes/',
+    roomname: window.location.hash.substr(2)  || "lobby",
+    server: 'http://127.0.0.1:3000/',
     username: 'anonymous',
-    roomname: 'lobby',
     lastMessageId: 0,
     friends: {},
 
     init: function() {
       // Get username
-      app.username = window.location.search.substr(10);
+      // app.username = window.location.search.substr(10);
 
       // Cache jQuery selectors
       app.$main = $('#main');
@@ -27,7 +27,7 @@ $(function() {
       app.$main.on('click', '.username', app.addFriend);
       app.$send.on('submit', app.handleSubmit);
       app.$roomSelect.on('change', app.saveRoom);
-
+      app.username = prompt('What is your name?') || 'anonymous';
       // Fetch previous messages
       app.startSpinner();
       app.fetch(false);
@@ -42,7 +42,7 @@ $(function() {
 
       // POST the message to the server
       $.ajax({
-        url: app.server,
+        url: app.server + app.roomname,
         type: 'POST',
         data: JSON.stringify(data),
         contentType: 'application/json',
@@ -58,10 +58,10 @@ $(function() {
     },
     fetch: function(animate) {
       $.ajax({
-        url: app.server,
+        url: app.server + app.roomname,
         type: 'GET',
         contentType: 'application/json',
-        data: { order: '-createdAt'},
+        // data: { order: '-createdAt'},
         // data: { order: '-createdAt'},
         success: function(data) {
           data = JSON.parse(data);
@@ -210,6 +210,7 @@ $(function() {
         // Fetch messages again
         app.fetch();
       }
+      window.history.pushState("","","#/" + app.roomname);
     },
     handleSubmit: function(evt) {
       var message = {

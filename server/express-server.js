@@ -6,8 +6,8 @@ var handleRequest = require('./request-handler.js');
 
 app.use(express.static("/Users/student/Documents/2015-06-chatterbox-server/chatterbox-client/client"));
 
-app.get('/classes', handleRequest.requestHandler);
-app.post('/classes', handleRequest.requestHandler);
+app.get('/:room', handleRequest.requestHandler);
+app.post('/:room', handleRequest.requestHandler);
 
 // create server
 // var server = app.listen(port, function() {

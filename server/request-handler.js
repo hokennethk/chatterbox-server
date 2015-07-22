@@ -57,13 +57,13 @@ var requestHandler = function(request, response) {
 
   // filter 'root' to serve files
   if (request.url === '/') {
-    console.log('root')
-    var dir = './chatterbox-client/';
-    expressApp.use(express.static(dir));
+    // console.log('root')
+    // var dir = './chatterbox-client/';
+    // // expressApp.use(express.static(dir));
 
-    response.writeHead(200, {'Content-Type' : 'text/html'});
-    response.end(dir + 'client/index.html')
-    // fs.readFile(dir, function (err,data) {
+    // response.writeHead(200, {'Content-Type' : 'text/html'});
+    // response.end(dir + 'client/index.html')
+    // // fs.readFile(dir, function (err,data) {
     //     if (err) {
     //       response.writeHead(404);
     //       console.log("--- ERROR SERVING FILES ----")
@@ -74,16 +74,23 @@ var requestHandler = function(request, response) {
     //     console.log("--- SERVING FILES ----")
     //     response.end(data);
     //   });
-  } else if (request.url.indexOf("classes") !== -1){
+  } 
+  // else if (request.url.indexOf("classes") !== -1){
     if(request.method === 'OPTIONS'){
       writeHead(200);
       response.end();
     }
     if (request.method === 'GET'){
+      var route = request.url;
+      console.log(" ---- URL NAME ---- ", route);
+      console.log(" ---- REQUEST.PARAMS NAME ---- ", request.params.room);
       writeHead(200);
       fs.readFile('server/results.txt', function(err, data){
         if (err) throw err;
         results = JSON.parse(data);
+        // _.filter(results, function(result){
+        //   return result.roomname === route.substr(1);
+        // }
         // console.log(results);
         var obj = {results: results};
         var stringified = JSON.stringify(obj);
@@ -123,7 +130,7 @@ var requestHandler = function(request, response) {
         });
       })
     }
-  } 
+  // } 
   // else {
   //   writeHead(404);
   //   console.log(" ----   UNKNOWN URL   ---- : ", request.url);
