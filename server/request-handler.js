@@ -82,8 +82,6 @@ var requestHandler = function(request, response) {
     }
     if (request.method === 'GET'){
       var route = request.url;
-      console.log(" ---- URL NAME ---- ", route);
-      console.log(" ---- REQUEST.PARAMS NAME ---- ", request.params.room);
       writeHead(200);
       fs.readFile('server/results.txt', function(err, data){
         if (err) throw err;
@@ -91,11 +89,8 @@ var requestHandler = function(request, response) {
         // _.filter(results, function(result){
         //   return result.roomname === route.substr(1);
         // }
-        // console.log(results);
         var obj = {results: results};
         var stringified = JSON.stringify(obj);
-        // console.log(stringified);
-        // console.log("MESSAGE ARRAY", obj.results)
         response.end(stringified);
       })
     }
@@ -104,8 +99,6 @@ var requestHandler = function(request, response) {
       writeHead(201);
       var requestBody = '';
       // results.push(request.json);
-      //console.log("request: ", Object.keys(request));
-      // console.log("client: ", request.client);
       request.on('data', function(chunk) {
         console.log(chunk);
         requestBody += chunk;
@@ -113,7 +106,6 @@ var requestHandler = function(request, response) {
 
       request.on('end', function() {
         console.log('request ended');
-        // console.log(requestBody);
         requestBody = JSON.parse(requestBody);
         requestBody.objectId = Math.random();
         requestBody.createdAt = new Date();
