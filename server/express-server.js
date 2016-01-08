@@ -9,11 +9,4 @@ app.use(express.static("/Users/student/Documents/2015-06-chatterbox-server/chatt
 app.get('/:room', handleRequest.requestHandler);
 app.post('/:room', handleRequest.requestHandler);
 
-// create server
-// var server = app.listen(port, function() {
-//   var host = server.address().address;
-//   var port = server.address().port;
-//   console.log("Listening on http://" + ip + ":" + port);
-// });
-
 app.listen(process.env.PORT || 3000);

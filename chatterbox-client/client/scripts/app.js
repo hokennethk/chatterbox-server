@@ -1,11 +1,6 @@
-// YOUR CODE HERE:
-
 var app;
 $(function() {
   app = {
-//TODO: The current 'addFriend' function just adds the class 'friend'
-//to all messages sent by the user
-    // server: 'https://api.parse.com/1/classes/chatterbox/',
     roomname: window.location.hash.substr(2)  || "lobby",
     server: 'http://127.0.0.1:3000/',
     username: 'anonymous',
@@ -13,9 +8,6 @@ $(function() {
     friends: {},
 
     init: function() {
-      // Get username
-      // app.username = window.location.search.substr(10);
-
       // Cache jQuery selectors
       app.$main = $('#main');
       app.$message = $('#message');
@@ -61,8 +53,6 @@ $(function() {
         url: app.server + app.roomname,
         type: 'GET',
         contentType: 'application/json',
-        // data: { order: '-createdAt'},
-        // data: { order: '-createdAt'},
         success: function(data) {
           data = JSON.parse(data);
           console.log('chatterbox: Messages fetched');

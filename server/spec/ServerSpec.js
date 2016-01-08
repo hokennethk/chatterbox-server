@@ -3,8 +3,6 @@ var expect = require('../../node_modules/chai/chai').expect;
 var basicServer = require('../basic-server').server;
 var stubs = require('./Stubs');
 
-// Conditional async testing, akin to Jasmine's waitsFor()
-// Will wait for test to be truthy before executing callback
 function waitForThen(test, cb) {
   setTimeout(function() {
     test() ? cb.apply(this) : waitForThen(test, cb);
@@ -13,8 +11,6 @@ function waitForThen(test, cb) {
 
 describe('Node Server Request Listener Function', function() {
   it('Should answer GET requests for /classes/room with a 200 status code', function() {
-    // This is a fake server request. Normally, the server would provide this,
-    // but we want to test our function's behavior totally independent of the server code
     var req = new stubs.request('/classes/room1', 'GET');
     var res = new stubs.response();
 
